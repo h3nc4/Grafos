@@ -25,21 +25,29 @@ import java.util.TreeMap;
  * 
  * @autor henrish0
  */
-public abstract class Grafo {
+public class Grafo {
     /** Nome do grafo. */
     private final String NOME;
 
     /** Vértices do grafo. */
-    private TreeMap<Integer, Vertice> vertices;
+    TreeMap<Integer, Vertice> vertices;
+
+    private IAddAresta addAresta;
 
     /**
      * Construtor padrão.
      * 
      * @param nome Nome do grafo.
      */
-    public Grafo(String nome) {
+    public Grafo(String nome, Boolean ponderado, Boolean direcionado) {
         this.NOME = nome;
         this.vertices = new TreeMap<Integer, Vertice>();
+        switch ((ponderado ? 1 : 0) + (direcionado ? 2 : 0)) {
+            case 0 -> this.addAresta = new AddArestaNPND();
+            case 1 -> this.addAresta = new AddArestaPND();
+            case 2 -> this.addAresta = new AddArestaNPD();
+            case 3 -> this.addAresta = new AddArestaPD();
+        }
     }
 
     /**
@@ -56,20 +64,40 @@ public abstract class Grafo {
         return this.vertices.put(id, new Vertice(id)) == null;
     }
 
-    /**
-     * Adiciona uma aresta ao grafo.
-     * 
-     * @param id1  Identificador do primeiro vértice.
-     * @param id2  Identificador do segundo vértice.
-     * @param peso Peso da aresta.
-     * @return <code>true</code> se a aresta foi adicionada, <code>false</code> se
-     *         a aresta já existia.
-     */
-    abstract public Boolean addAresta(Integer id1, Integer id2);
-
-    @Override
-    public String toString() {
-        return "Grafo [nome=" + this.NOME + ", vertices= {" + this.vertices + "}]";
+    public Boolean addAresta(Integer origem, Integer destino) {
+        Vertice vOrigem = vertices.get(origem),
+                vDestino = vertices.get(destino);
+        return vOrigem == null || vDestino == null || vOrigem.haAresta(vDestino.getID()) ? false
+                : this.addAresta.addAresta(vOrigem, vDestino);
     }
+
+    // @formatter:off
+    @Override public String toString() { return "Grafo [nome=" + this.NOME + ", vertices= {" + this.vertices + "}]"; }
+
+    /** Define a forma de adicionar arestas ao grafo não ponderado não direcionado. */ 
+    private class AddArestaNPND implements IAddAresta {
+        @Override public Boolean addAresta(Vertice origem, Vertice destino) {
+            return origem.addAresta(new Aresta(destino)) && destino.addAresta(new Aresta(origem));
+        }
+    }
+    /** Define a forma de adicionar arestas ao grafo não ponderado direcionado. */
+    private class AddArestaNPD implements IAddAresta {
+        @Override public Boolean addAresta(Vertice origem, Vertice destino) {
+            return origem.addAresta(new Aresta(vertices.get(destino.getID())));
+        }
+    }
+    /** Define a forma de adicionar arestas ao grafo ponderado não direcionado. */
+    private class AddArestaPND implements IAddAresta {
+        @Override public Boolean addAresta(Vertice origem, Vertice destino) {
+            int peso = App.lerInt("Peso da aresta: ");
+            return origem.addAresta(new ArestaPonderada(destino, peso)) && destino.addAresta(new ArestaPonderada(origem, peso));
+        }
+    }
+    /** Define a forma de adicionar arestas ao grafo ponderado direcionado. */
+    private class AddArestaPD implements IAddAresta {
+        @Override public Boolean addAresta(Vertice origem, Vertice destino) {
+            return origem.addAresta(new ArestaPonderada(vertices.get(destino.getID()), App.lerInt("Peso da aresta: ")));
+        }
+    } // @formatter:on
 
 }

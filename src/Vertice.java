@@ -52,7 +52,7 @@ public class Vertice implements Comparable<Vertice> {
      * 
      * @param aresta Aresta a ser adicionada.
      * @return <code>true</code> se a aresta foi adicionada, <code>false</code> se a
-     *        aresta já existia.
+     *         aresta já existia.
      */
     public Boolean addAresta(IAresta aresta) {
         return this.arestas.put(aresta.getDestino().ID, aresta) == null;
@@ -71,5 +71,7 @@ public class Vertice implements Comparable<Vertice> {
     // @formatter:off
     /** getID @return Identificador do vértice. */
     public Integer getID() { return this.ID; }
+    /** haAresta @return <code>true</code> se o vértice possui a aresta, <code>false</code> caso contrário. */
+    public Boolean haAresta(Integer id) { return this.arestas.containsKey(id); }
 
 }

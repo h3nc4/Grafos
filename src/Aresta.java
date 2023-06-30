@@ -42,18 +42,11 @@ public class Aresta implements IAresta {
         this.visitada = false;
     }
 
-    @Override
-    public String toString() {
-        return "\n      destino=" + this.DESTINO.getID() + ", visitada=" + this.visitada;
-    }
-
     // @formatter:off
+    @Override public String toString() { return "\n      Aresta destino=" + this.DESTINO.getID() + ", visitada=" + this.visitada; }
     @Override public Vertice getDestino() { return this.DESTINO; }
-
     @Override public Boolean eVisitada() { return this.visitada; }
-
     @Override public void setVisitada(Boolean visitada) { this.visitada = visitada; }
-
-    @Override public Integer getPeso() { return Integer.MIN_VALUE; }
+    @Override public Integer getPeso() { return null; }
 
 }

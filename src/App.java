@@ -68,6 +68,8 @@ public class App {
      * Menu para criação de um grafo.
      */
     private static void menuCriacao() {
+        if (grafo != null && !App.lerStr(" Deseja sobrescrever o grafo atual? (S/N) ").equalsIgnoreCase("S"))
+            return;
         grafo = new Grafo(
                 App.lerStr("\n Digite o nome do grafo: "),
                 App.lerStr(" O grafo sera ponderado? (S/N) ").equalsIgnoreCase("S"),
@@ -85,9 +87,10 @@ public class App {
     private static Integer menuMainStr() {
         return App.lerInt("\n\n Digite o numero da opcao desejada e pressione ENTER\n"
                 + " 1 - Criar um grafo\n"
-                + " 2 - Adicionar um vertice\n"
-                + " 3 - Adicionar uma aresta\n"
-                + " 4 - Imprimir grafo\n"
+                + " 2 - Carregar um grafo\n"
+                + " 3 - Adicionar um vertice\n"
+                + " 4 - Adicionar uma aresta\n"
+                + " 5 - Imprimir grafo\n"
                 + " 0 - Sair\n " //
         );
     }
@@ -98,14 +101,15 @@ public class App {
     private static void menuMain() {
         switch (App.menuMainStr()) {
             case 1 -> App.menuCriacao();
-            case 2 -> {
+            case 2 -> grafo = Grafo.carregar(App.lerStr(" Digite o nome do arquivo: "));
+            case 3 -> {
                 if (grafo.addVertice(App.lerInt(" Digite o id do vertice: ")))
                     System.out.println(" Vertice adicionado com sucesso");
                 else
                     System.out.println(" Erro ao adicionar vertice, verifique se o vertice ja existe");
                 App.pause();
             }
-            case 3 -> {
+            case 4 -> {
                 if (grafo.addAresta(App.lerInt(" Digite o id do vertice de origem: "),
                         App.lerInt(" Digite o id do vertice de destino: ")))
                     System.out.println(" Aresta adicionada com sucesso");
@@ -114,16 +118,20 @@ public class App {
                             " Erro ao adicionar aresta, verifique se os vertices existem ou se a aresta ja existe");
                 App.pause();
             }
-            case 4 -> {
+            case 5 -> {
                 System.out.println(grafo);
                 App.pause();
             }
-            case 0 -> System.exit(0);
+            case 0 -> {
+                if (App.lerStr(" Deseja salvar o grafo? (S/N) ").equalsIgnoreCase("S"))
+                    grafo.salvar();
+                System.exit(0);
+            }
             default -> App.menuMain();
         }
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Throwable {
         System.out.print("\n\n\n\n\n\n\n\n\n\n\n Refatoracao do projeto de grafos");
         while (true)
             App.menuMain();

@@ -18,6 +18,10 @@
  * <https://www.gnu.org/licenses/>.
 */
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.TreeMap;
 
 /**
@@ -30,9 +34,14 @@ public class Grafo {
     private final String NOME;
 
     /** Vértices do grafo. */
-    TreeMap<Integer, Vertice> vertices;
+    private TreeMap<Integer, Vertice> vertices;
 
+    /** Estratégia de adição de arestas. */
     private IAddAresta addAresta;
+
+    private Boolean ponderado;
+
+    private Boolean direcionado;
 
     /**
      * Construtor padrão.
@@ -48,6 +57,8 @@ public class Grafo {
             case 2 -> this.addAresta = new AddArestaNPD();
             case 3 -> this.addAresta = new AddArestaPD();
         }
+        this.ponderado = ponderado;
+        this.direcionado = direcionado;
     }
 
     /**
@@ -64,6 +75,14 @@ public class Grafo {
         return this.vertices.put(id, new Vertice(id)) == null;
     }
 
+    /**
+     * Adiciona uma aresta ao grafo.
+     * 
+     * @param id1 Identificador do vértice de origem.
+     * @param id2 Identificador do vértice de destino.
+     * @return <code>true</code> se a aresta foi adicionada, <code>false</code> se a
+     *         aresta já existia.
+     */
     public Boolean addAresta(Integer id1, Integer id2) {
         Vertice vOrigem = vertices.get(id1),
                 vDestino = vertices.get(id2);
@@ -71,14 +90,39 @@ public class Grafo {
                 : this.addAresta.addAresta(vOrigem, vDestino);
     }
 
-    private String vertices(){
-        StringBuilder sb = new StringBuilder();
-        vertices.values().forEach(v -> sb.append(v.toString()));
-        return new String(sb);
+    /**
+     * Salva o grafo em um arquivo.
+     * 
+     * @return <code>true</code> se o grafo foi salvo, <code>false</code> se houve
+     *         algum erro.
+     */
+    public Boolean salvar() {
+        StringBuilder sb = new StringBuilder(
+                (this.ponderado ? "1" : "0") +
+                        (this.direcionado ? "1" : "0") + "\n" //
+        );
+        vertices.values().forEach(v -> sb.append(v.getID()).append(";")); // IDs dos vértices
+        sb.append("\n");
+        vertices.values().forEach(v -> sb.append(v.toFile())); // Arestas
+        return Arquivo.salvarGrafo(new String(sb), this.NOME);
     }
 
-    // @formatter:off
-    @Override public String toString() { return "\n\nGrafo \"" + this.NOME + "\", vertices= {" + this.vertices() + "\n}"; }
+    /**
+     * Carrega um grafo de um arquivo.
+     * 
+     * @param nome Nome do arquivo.
+     * @return Grafo carregado.
+     */
+    public static Grafo carregar(String nome) {
+        return Arquivo.lerGrafo(nome);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        vertices.values().forEach(v -> sb.append(v.toString()));
+        return "\n\nGrafo \"" + this.NOME + "\", vertices= {" + new String(sb) + "\n}";
+    }// @formatter:off
 
     /** Define a forma de adicionar arestas ao grafo não ponderado não direcionado. */ 
     private class AddArestaNPND implements IAddAresta {
@@ -104,6 +148,60 @@ public class Grafo {
         @Override public Boolean addAresta(Vertice origem, Vertice destino) {
             return origem.addAresta(new ArestaPonderada(vertices.get(destino.getID()), App.lerInt("Peso da aresta: ")));
         }
-    } // @formatter:on
+    }
 
+    /** Escreve e lê grafos. */
+    private class Arquivo {
+        /** Tipo de arquivo. */
+        private static String TIPO = ".csv";
+        /** Pasta onde os arquivos são salvos. */
+        private static String PASTA = "data/";
+
+        /**
+         * Salva o grafo em um arquivo.
+         * 
+         * @param conteudo Conteúdo do arquivo.
+         * @param nome     Nome do arquivo.
+         * @return <code>true</code> se o arquivo foi salvo, <code>false</code> se
+         *         ocorreu algum erro.
+         */
+        private static Boolean salvarGrafo(String conteudo, String nome) {
+            try (FileWriter fw = new FileWriter(PASTA + nome + TIPO)) {
+                fw.write(conteudo);
+                return true;
+            } catch (IOException e) {
+                return false;
+            }
+        }
+
+        /**
+         * Lê um grafo de um arquivo.
+         * 
+         * @param nome Nome do arquivo.
+         * @return Grafo lido.
+         */
+        private static Grafo lerGrafo(String nome) {
+            Grafo out = null;
+            try (BufferedReader br = new BufferedReader(new FileReader(PASTA + nome + TIPO))) {
+                String linha = br.readLine();
+                out = new Grafo(nome, linha.charAt(0) == '1', linha.charAt(1) == '1');
+                for (String id : br.readLine().split(";"))
+                    out.addVertice(Integer.parseInt(id));
+                for (String item : br.readLine().split(";")) {
+                    String[] ids = item.split("-");
+                    // Em caso de out não direcionado, a aresta foi escrita nos dois sentidos.
+                    // Elimina-se a verificação de direcionado
+                    switch (out.ponderado ? 1 : 0) {
+                        case 0 -> out.vertices.get(Integer.parseInt(ids[0])).addAresta(new Aresta(
+                                out.vertices.get(Integer.parseInt(ids[1]))));
+
+                        case 1 -> out.vertices.get(Integer.parseInt(ids[0])).addAresta(new ArestaPonderada(
+                                out.vertices.get(Integer.parseInt(ids[1])), Integer.parseInt(ids[2])));
+                    }
+                }
+                br.close();
+            } catch (IOException e) {}
+            return out;
+        } // @formatter:on
+    }
 }

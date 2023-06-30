@@ -58,20 +58,31 @@ public class Vertice implements Comparable<Vertice> {
         return this.arestas.put(aresta.getDestino().ID, aresta) == null;
     }
 
-    private String arestas(){
+    /**
+     * Retorna uma representação das arestas do vértice para ser salva em arquivo.
+     * 
+     * @return String com as arestas do vértice.
+     */
+    public String toFile() {
         StringBuilder sb = new StringBuilder();
-        arestas.values().forEach(v -> sb.append(v.toString()).append("\n"));
+        arestas.values().forEach(a -> {
+            Integer peso = a.getPeso();
+            sb.append(this.ID).append("-").append(a.getDestino().getID()).append(peso != null ? "-" + peso : "")
+                    .append(";");
+        });
         return new String(sb);
-    }
-
-    @Override
-    public String toString() {
-        return "\n  ID=" + this.ID + ", visitado=" + this.visitado + ", arestas= {" + this.arestas() + "   }";
     }
 
     @Override
     public int compareTo(Vertice o) {
         return this.ID - o.ID;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        arestas.values().forEach(a -> sb.append(a.toString()).append("\n"));
+        return "\n  Vertice ID=" + this.ID + ", visitado=" + this.visitado + ", arestas= {" + new String(sb) + "   }";
     }
 
     // @formatter:off

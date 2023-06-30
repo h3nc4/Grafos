@@ -73,6 +73,17 @@ public class Vertice implements Comparable<Vertice> {
         return new String(sb);
     }
 
+    /**
+     * Remove uma aresta do vértice atual.
+     * 
+     * @param id Identificador do vértice de destino da aresta a ser removida.
+     * @return <code>true</code> se a aresta foi removida, <code>false</code> se a
+     *        aresta não existia.
+     */
+    public Boolean removerAresta(Integer id) {
+        return this.arestas.remove(id) != null;
+    }
+
     @Override
     public int compareTo(Vertice o) {
         return this.ID - o.ID;

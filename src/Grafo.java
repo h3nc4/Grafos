@@ -39,8 +39,10 @@ public class Grafo {
     /** Estratégia de adição de arestas. */
     private IAddAresta addAresta;
 
+    /** Indica se o grafo é ponderado. */
     private Boolean ponderado;
 
+    /** Indica se o grafo é direcionado. */
     private Boolean direcionado;
 
     /**
@@ -88,6 +90,37 @@ public class Grafo {
                 vDestino = vertices.get(id2);
         return vOrigem == null || vDestino == null || vOrigem.haAresta(vDestino.getID()) ? false
                 : this.addAresta.addAresta(vOrigem, vDestino);
+    }
+
+    /**
+     * Remove um vértice do grafo.
+     * 
+     * @param id Identificador do vértice.
+     * @return <code>true</code> se o vértice foi removido, <code>false</code> se o
+     *         vértice não existia.
+     */
+    public Boolean removerVertice(Integer id) {
+        Vertice v = vertices.remove(id);
+        if (v == null)
+            return false;
+        vertices.values().forEach(v2 -> v2.removerAresta(id));
+        return true;
+    }
+
+    /**
+     * Remove uma aresta do grafo.
+     * 
+     * @param id1 Identificador do vértice de origem.
+     * @param id2 Identificador do vértice de destino.
+     * @return <code>true</code> se a aresta foi removida, <code>false</code> se a
+     *         aresta não existia.
+     */
+    public Boolean removerAresta(Integer id1, Integer id2) {
+        Vertice vOrigem = vertices.get(id1),
+                vDestino = vertices.get(id2);
+        return vOrigem == null || vDestino == null || !vOrigem.haAresta(vDestino.getID()) ? false
+                : vOrigem.removerAresta(vDestino.getID())
+                        && (!this.direcionado ? vDestino.removerAresta(vOrigem.getID()) : true);
     }
 
     /**

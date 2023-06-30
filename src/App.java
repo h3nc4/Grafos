@@ -90,7 +90,9 @@ public class App {
                 + " 2 - Carregar um grafo\n"
                 + " 3 - Adicionar um vertice\n"
                 + " 4 - Adicionar uma aresta\n"
-                + " 5 - Imprimir grafo\n"
+                + " 5 - Remover um vertice\n"
+                + " 6 - Remover uma aresta\n"
+                + " 7 - Imprimir grafo\n"
                 + " 0 - Sair\n " //
         );
     }
@@ -119,6 +121,21 @@ public class App {
                 App.pause();
             }
             case 5 -> {
+                if (grafo.removerVertice(App.lerInt(" Digite o id do vertice: ")))
+                    System.out.println(" Vertice removido com sucesso");
+                else
+                    System.out.println(" Erro ao remover vertice, verifique se o vertice existe");
+                App.pause();
+            }
+            case 6 -> {
+                if (grafo.removerAresta(App.lerInt(" Digite o id do vertice de origem: "),
+                        App.lerInt(" Digite o id do vertice de destino: ")))
+                    System.out.println(" Aresta removida com sucesso");
+                else
+                    System.out.println(" Erro ao remover aresta, verifique se a aresta existe");
+                App.pause();
+            }
+            case 7 -> {
                 System.out.println(grafo);
                 App.pause();
             }

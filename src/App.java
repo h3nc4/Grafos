@@ -39,7 +39,8 @@ public class App {
      * @return string lida do console.
      */
     public static String lerStr(String mensagem) {
-        return System.console().readLine(mensagem);
+        String out = System.console().readLine(mensagem);
+        return out == null || out.isBlank() ? App.lerStr(" ERRO: Valor invalido. Digite novamente: ") : out.trim();
     }
 
     /**
@@ -52,12 +53,80 @@ public class App {
         try {
             return Integer.parseInt(App.lerStr(mensagem));
         } catch (NumberFormatException e) {
-            return lerInt(" ERRO: Valor invalido. Digite um numero inteiro: ");
+            return App.lerInt(" ERRO: Valor invalido. Digite um numero inteiro: ");
+        }
+    }
+
+    /**
+     * Método que pause a execução do programa até que o usuário pressione ENTER.
+     */
+    public static void pause() {
+        System.console().readLine("\n Pressione ENTER para continuar...");
+    }
+
+    /**
+     * Menu para criação de um grafo.
+     */
+    private static void menuCriacao() {
+        grafo = new Grafo(
+                App.lerStr("\n Digite o nome do grafo: "),
+                App.lerStr(" O grafo sera ponderado? (S/N) ").equalsIgnoreCase("S"),
+                App.lerStr(" O grafo sera direcionado? (S/N) ").equalsIgnoreCase("S") //
+        );
+        System.out.println(" Grafo criado com sucesso!");
+        App.pause();
+    }
+
+    /**
+     * Menu principal do programa.
+     * 
+     * @return opção escolhida pelo usuário.
+     */
+    private static Integer menuMainStr() {
+        return App.lerInt("\n\n Digite o numero da opcao desejada e pressione ENTER\n"
+                + " 1 - Criar um grafo\n"
+                + " 2 - Adicionar um vertice\n"
+                + " 3 - Adicionar uma aresta\n"
+                + " 4 - Imprimir grafo\n"
+                + " 0 - Sair\n " //
+        );
+    }
+
+    /**
+     * Método que executa a opção escolhida pelo usuário.
+     */
+    private static void menuMain() {
+        switch (App.menuMainStr()) {
+            case 1 -> App.menuCriacao();
+            case 2 -> {
+                if (grafo.addVertice(App.lerInt(" Digite o id do vertice: ")))
+                    System.out.println(" Vertice adicionado com sucesso");
+                else
+                    System.out.println(" Erro ao adicionar vertice, verifique se o vertice ja existe");
+                App.pause();
+            }
+            case 3 -> {
+                if (grafo.addAresta(App.lerInt(" Digite o id do vertice de origem: "),
+                        App.lerInt(" Digite o id do vertice de destino: ")))
+                    System.out.println(" Aresta adicionada com sucesso");
+                else
+                    System.out.println(
+                            " Erro ao adicionar aresta, verifique se os vertices existem ou se a aresta ja existe");
+                App.pause();
+            }
+            case 4 -> {
+                System.out.println(grafo);
+                App.pause();
+            }
+            case 0 -> System.exit(0);
+            default -> App.menuMain();
         }
     }
 
     public static void main(String[] args) throws Exception {
-
+        System.out.print("\n\n\n\n\n\n\n\n\n\n\n Refatoracao do projeto de grafos");
+        while (true)
+            App.menuMain();
     }
 
 }

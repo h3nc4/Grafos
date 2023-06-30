@@ -58,9 +58,15 @@ public class Vertice implements Comparable<Vertice> {
         return this.arestas.put(aresta.getDestino().ID, aresta) == null;
     }
 
+    private String arestas(){
+        StringBuilder sb = new StringBuilder();
+        arestas.values().forEach(v -> sb.append(v.toString()).append("\n"));
+        return new String(sb);
+    }
+
     @Override
     public String toString() {
-        return "\n  Vertice [id=" + this.ID + ", visitado=" + this.visitado + ", arestas= {" + this.arestas + "}]";
+        return "\n  ID=" + this.ID + ", visitado=" + this.visitado + ", arestas= {" + this.arestas() + "   }";
     }
 
     @Override

@@ -47,7 +47,7 @@ public class ArestaPonderada implements Comparable<IAresta>, IAresta {
 
     @Override
     public String toString() {
-        return "\n      Aresta [destino=" + this.DESTINO + ", peso=" + this.PESO + ", visitada=" + this.visitada + "]";
+        return "\n      destino=" + this.DESTINO.getID() + ", peso=" + this.PESO +  ", visitada=" + this.visitada;
     }
 
     @Override

@@ -64,15 +64,21 @@ public class Grafo {
         return this.vertices.put(id, new Vertice(id)) == null;
     }
 
-    public Boolean addAresta(Integer origem, Integer destino) {
-        Vertice vOrigem = vertices.get(origem),
-                vDestino = vertices.get(destino);
+    public Boolean addAresta(Integer id1, Integer id2) {
+        Vertice vOrigem = vertices.get(id1),
+                vDestino = vertices.get(id2);
         return vOrigem == null || vDestino == null || vOrigem.haAresta(vDestino.getID()) ? false
                 : this.addAresta.addAresta(vOrigem, vDestino);
     }
 
+    private String vertices(){
+        StringBuilder sb = new StringBuilder();
+        vertices.values().forEach(v -> sb.append(v.toString()));
+        return new String(sb);
+    }
+
     // @formatter:off
-    @Override public String toString() { return "Grafo [nome=" + this.NOME + ", vertices= {" + this.vertices + "}]"; }
+    @Override public String toString() { return "\n\nGrafo \"" + this.NOME + "\", vertices= {" + this.vertices() + "\n}"; }
 
     /** Define a forma de adicionar arestas ao grafo não ponderado não direcionado. */ 
     private class AddArestaNPND implements IAddAresta {

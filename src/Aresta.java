@@ -44,7 +44,7 @@ public class Aresta implements IAresta {
 
     @Override
     public String toString() {
-        return "\n      Aresta [destino=" + this.DESTINO + ", visitada=" + this.visitada + "]";
+        return "\n      destino=" + this.DESTINO.getID() + ", visitada=" + this.visitada;
     }
 
     // @formatter:off

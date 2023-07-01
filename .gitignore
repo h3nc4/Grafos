@@ -3,3 +3,4 @@ release
 data
 *.dia
 *.autosave
+*.log

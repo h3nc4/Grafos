@@ -27,6 +27,9 @@ import java.util.TreeMap;
 /**
  * Classe que representa um grafo.
  * 
+ * @see <a href="https://pt.wikipedia.org/wiki/Grafo">Grafo</a>
+ * @see Vertice
+ * @see IAresta
  * @autor henrish0
  */
 public class Grafo {
@@ -124,6 +127,45 @@ public class Grafo {
     }
 
     /**
+     * Gera um grafo completo.
+     * 
+     * @param n Número de vértices do grafo.
+     * @return <code>true</code> se o grafo foi gerado, <code>false</code> se o
+     *         grafo não foi gerado.
+     */
+    public Boolean gerarCompleto(int n) {
+        if (n < 1)
+            return false;
+
+        for (int i = 0; i < n; i++)
+            this.addVertice(i);
+
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                if (i != j)
+                    this.addAresta(i, j);
+
+        return true;
+    }
+
+    /**
+     * Verifica se o grafo é completo.
+     * 
+     * @return <code>true</code> se o grafo é completo, <code>false</code> se o
+     *         grafo
+     *         não é completo.
+     */
+    public Boolean completo() {
+        if (this.vertices.isEmpty())
+            return true;
+
+        this.vertices.values().forEach(v -> v.setVisitado(false));
+        this.vertices.firstEntry().getValue().setVisitado(true);
+        return this.vertices.values().stream().allMatch(v -> v.getVisitado()
+                && v.getArestas().stream().allMatch(a -> a.getDestino().getVisitado()));
+    }
+
+    /**
      * Salva o grafo em um arquivo.
      * 
      * @return <code>true</code> se o grafo foi salvo, <code>false</code> se houve
@@ -211,7 +253,7 @@ public class Grafo {
          * Lê um grafo de um arquivo.
          * 
          * @param nome Nome do arquivo.
-         * @return Grafo lido.
+         * @return Grafo lido, <code>null</code> se ocorreu erro de leitura.
          */
         private static Grafo lerGrafo(String nome) {
             Grafo out = null;
@@ -222,14 +264,11 @@ public class Grafo {
                     out.addVertice(Integer.parseInt(id));
                 for (String item : br.readLine().split(";")) {
                     String[] ids = item.split("-");
-                    // Em caso de out não direcionado, a aresta foi escrita nos dois sentidos.
+                    // Em caso de grafo não direcionado, a aresta foi escrita nos dois sentidos.
                     // Elimina-se a verificação de direcionado
                     switch (out.ponderado ? 1 : 0) {
-                        case 0 -> out.vertices.get(Integer.parseInt(ids[0])).addAresta(new Aresta(
-                                out.vertices.get(Integer.parseInt(ids[1]))));
-
-                        case 1 -> out.vertices.get(Integer.parseInt(ids[0])).addAresta(new ArestaPonderada(
-                                out.vertices.get(Integer.parseInt(ids[1])), Integer.parseInt(ids[2])));
+                        case 0 -> out.vertices.get(Integer.parseInt(ids[0])).addAresta(new Aresta(out.vertices.get(Integer.parseInt(ids[1]))));
+                        case 1 -> out.vertices.get(Integer.parseInt(ids[0])).addAresta(new ArestaPonderada(out.vertices.get(Integer.parseInt(ids[1])), Integer.parseInt(ids[2])));
                     }
                 }
                 br.close();

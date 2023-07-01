@@ -21,6 +21,7 @@
 /**
  * Classe que representa a aresta de um grafo ponderado.
  * 
+ * @see IAresta
  * @author henrish0
  */
 public class ArestaPonderada implements Comparable<IAresta>, IAresta {

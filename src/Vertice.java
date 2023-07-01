@@ -18,6 +18,7 @@
  * <https://www.gnu.org/licenses/>.
 */
 
+import java.util.Collection;
 import java.util.TreeMap;
 
 /**
@@ -59,26 +60,11 @@ public class Vertice implements Comparable<Vertice> {
     }
 
     /**
-     * Retorna uma representação das arestas do vértice para ser salva em arquivo.
-     * 
-     * @return String com as arestas do vértice.
-     */
-    public String toFile() {
-        StringBuilder sb = new StringBuilder();
-        arestas.values().forEach(a -> {
-            Integer peso = a.getPeso();
-            sb.append(this.ID).append("-").append(a.getDestino().getID()).append(peso != null ? "-" + peso : "")
-                    .append(";");
-        });
-        return new String(sb);
-    }
-
-    /**
      * Remove uma aresta do vértice atual.
      * 
      * @param id Identificador do vértice de destino da aresta a ser removida.
      * @return <code>true</code> se a aresta foi removida, <code>false</code> se a
-     *        aresta não existia.
+     *         aresta não existia.
      */
     public Boolean removerAresta(Integer id) {
         return this.arestas.remove(id) != null;
@@ -89,17 +75,36 @@ public class Vertice implements Comparable<Vertice> {
         return this.ID - o.ID;
     }
 
-    @Override
+    @Override // @formatter:off
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        arestas.values().forEach(a -> sb.append(a.toString()).append("\n"));
-        return "\n  Vertice ID=" + this.ID + ", visitado=" + this.visitado + ", arestas= {" + new String(sb) + "   }";
+        arestas.values().forEach(a -> sb.append(a.toString()));
+        return "\n  Vertice ID=" + this.ID + ", visitado=" + this.visitado + ", arestas= {" + new String(sb.append("\n   }"));
     }
 
-    // @formatter:off
+    /**
+     * Retorna uma representação das arestas do vértice para ser salva em arquivo.
+     * 
+     * @return String com as arestas do vértice.
+     */
+    public String toFile() {
+        StringBuilder sb = new StringBuilder();
+        arestas.values().forEach(a -> {
+            Integer peso = a.getPeso();
+            sb.append(this.ID).append("-").append(a.getDestino().getID()).append(peso != null ? "-" + peso : "").append(";");
+        });
+        return new String(sb);
+    }
+
     /** getID @return Identificador do vértice. */
     public Integer getID() { return this.ID; }
     /** haAresta @return <code>true</code> se o vértice possui a aresta, <code>false</code> caso contrário. */
     public Boolean haAresta(Integer id) { return this.arestas.containsKey(id); }
+    /** getArestas @return Arestas que saem do vértice atual. */
+    public Collection<IAresta> getArestas() { return this.arestas.values(); }
+    /** getVisitado @return <code>true</code> se o vértice já foi visitado por um algoritmo, <code>false</code> caso contrário. */
+    public Boolean getVisitado() { return this.visitado; }
+    /** setVisitado @param visitado Indica se o vértice já foi visitado por um algoritmo. */
+    public void setVisitado(Boolean visitado) { this.visitado = visitado; }
 
 }

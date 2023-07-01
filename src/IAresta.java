@@ -23,8 +23,9 @@
  * permite abstração entre arestas ponderadas e não ponderadas.
  * 
  * @see Vertice
+ * @see Aresta
  * @see ArestaPonderada
- * @see ArestaNaoPonderada
+ * @see IAddAresta
  * @autor henrish0
  */
 public interface IAresta {

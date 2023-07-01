@@ -19,7 +19,7 @@
 */
 
 /**
- * Interface para adicionar arestas ao grafo.
+ * Interface que define como adicionar arestas ao grafo.
  * <br><br>
  * Usa o padrão de projeto <code>Strategy</code>.
  * 

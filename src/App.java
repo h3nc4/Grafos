@@ -21,7 +21,7 @@
 /**
  * Classe principal do programa.
  * 
- * @autor henrish0
+ * @author henrish0
  */
 public class App {
     /** Grafo que será utilizado no programa */
@@ -154,6 +154,12 @@ public class App {
 
     }
 
+    /**
+     * Método principal do programa.
+     * 
+     * @param args argumentos passados ao programa.
+     * @throws Throwable qualquer exceção lançada pelo programa.
+     */
     public static void main(String[] args) throws Throwable {
         System.out.print("\n\n\n\n\n\n\n\n\n\n\n Refatoracao do projeto de grafos");
         while (true)
@@ -161,9 +167,6 @@ public class App {
                 App.menuMain();
             } catch (NullPointerException e) {
                 System.out.println(" ERRO: Grafo nao criado");
-                App.pause();
-            } catch (Exception e) {
-                System.out.println(" ERRO: " + e.getMessage());
                 App.pause();
             }
     }

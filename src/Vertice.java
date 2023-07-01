@@ -25,7 +25,7 @@ import java.util.TreeMap;
  * Classe que representa um vértice de um grafo.
  * 
  * @see IAresta
- * @autor henrish0
+ * @author henrish0
  */
 public class Vertice implements Comparable<Vertice> {
     /** Identificador do vértice. */
@@ -96,15 +96,21 @@ public class Vertice implements Comparable<Vertice> {
         return new String(sb);
     }
 
-    /** getID @return Identificador do vértice. */
+    /** getID
+     * @return Identificador do vértice. */
     public Integer getID() { return this.ID; }
-    /** haAresta @return <code>true</code> se o vértice possui a aresta, <code>false</code> caso contrário. */
+    /** haAresta
+     * @param id Identificador do vértice de destino da aresta.
+     * @return <code>true</code> se o vértice possui a aresta, <code>false</code> caso contrário. */
     public Boolean haAresta(Integer id) { return this.arestas.containsKey(id); }
-    /** getArestas @return Arestas que saem do vértice atual. */
+    /** getArestas
+     * @return Arestas que saem do vértice atual. */
     public Collection<IAresta> getArestas() { return this.arestas.values(); }
-    /** getVisitado @return <code>true</code> se o vértice já foi visitado por um algoritmo, <code>false</code> caso contrário. */
+    /** getVisitado
+     * @return <code>true</code> se o vértice já foi visitado por um algoritmo, <code>false</code> caso contrário. */
     public Boolean getVisitado() { return this.visitado; }
-    /** setVisitado @param visitado Indica se o vértice já foi visitado por um algoritmo. */
+    /** setVisitado
+     * @param visitado Indica se o vértice já foi visitado por um algoritmo. */
     public void setVisitado(Boolean visitado) { this.visitado = visitado; }
 
 }

@@ -30,7 +30,7 @@ import java.util.TreeMap;
  * @see <a href="https://pt.wikipedia.org/wiki/Grafo">Grafo</a>
  * @see Vertice
  * @see IAresta
- * @autor henrish0
+ * @author henrish0
  */
 public class Grafo {
     /** Nome do grafo. */
@@ -51,7 +51,9 @@ public class Grafo {
     /**
      * Construtor padrão.
      * 
-     * @param nome Nome do grafo.
+     * @param nome        Nome do grafo.
+     * @param ponderado   Indica se o grafo é ponderado.
+     * @param direcionado Indica se o grafo é direcionado.
      */
     public Grafo(String nome, Boolean ponderado, Boolean direcionado) {
         this.NOME = nome;
@@ -201,18 +203,24 @@ public class Grafo {
 
     /** Define a forma de adicionar arestas ao grafo não ponderado não direcionado. */ 
     private class AddArestaNPND implements IAddAresta {
+        /** Construtor privado para impedir a criação de instâncias fora da classe Grafo. */
+        private AddArestaNPND() {}
         @Override public Boolean addAresta(Vertice origem, Vertice destino) {
             return origem.addAresta(new Aresta(destino)) && destino.addAresta(new Aresta(origem));
         }
     }
     /** Define a forma de adicionar arestas ao grafo não ponderado direcionado. */
     private class AddArestaNPD implements IAddAresta {
+        /** Construtor privado para impedir a criação de instâncias fora da classe Grafo. */
+        private AddArestaNPD() {}
         @Override public Boolean addAresta(Vertice origem, Vertice destino) {
             return origem.addAresta(new Aresta(vertices.get(destino.getID())));
         }
     }
     /** Define a forma de adicionar arestas ao grafo ponderado não direcionado. */
     private class AddArestaPND implements IAddAresta {
+        /** Construtor privado para impedir a criação de instâncias fora da classe Grafo. */
+        private AddArestaPND() {}
         @Override public Boolean addAresta(Vertice origem, Vertice destino) {
             int peso = App.lerInt("Peso da aresta: ");
             return origem.addAresta(new ArestaPonderada(destino, peso)) && destino.addAresta(new ArestaPonderada(origem, peso));
@@ -220,6 +228,8 @@ public class Grafo {
     }
     /** Define a forma de adicionar arestas ao grafo ponderado direcionado. */
     private class AddArestaPD implements IAddAresta {
+        /** Construtor privado para impedir a criação de instâncias fora da classe Grafo. */
+        private AddArestaPD() {}
         @Override public Boolean addAresta(Vertice origem, Vertice destino) {
             return origem.addAresta(new ArestaPonderada(vertices.get(destino.getID()), App.lerInt("Peso da aresta: ")));
         }
@@ -231,6 +241,9 @@ public class Grafo {
         private static String TIPO = ".csv";
         /** Pasta onde os arquivos são salvos. */
         private static String PASTA = "data/";
+
+        /** Construtor que garante classe não instanciável */
+        private Arquivo() { throw new InstantiationError("Classe nao instanciavel"); }
 
         /**
          * Salva o grafo em um arquivo.

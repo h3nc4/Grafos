@@ -22,7 +22,7 @@
  * Classe que representa uma aresta não ponderada.
  * 
  * @see IAresta
- * @autor henrish0
+ * @author henrish0
  */
 public class Aresta implements IAresta {
     /** Vértice de destino desta aresta. */
@@ -35,7 +35,6 @@ public class Aresta implements IAresta {
      * Construtor padrão.
      * 
      * @param destino Vértice de destino desta aresta.
-     * @param peso    Peso desta aresta.
      */
     public Aresta(Vertice destino) {
         this.DESTINO = destino;

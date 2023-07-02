@@ -4,9 +4,9 @@
 
 Este projeto é a reconstrução da implementação de um grafo para a disciplina de Teoria dos Grafos com técnicas de programação orientada a objetos.
 
-## Versões
+## Versão atual
 
-![Diagrama inicial](./docs/grafo_scrub.png)
+![Versão atual](./docs/grafo_06.png)
 
 ## Como executar
 

@@ -23,18 +23,18 @@
  * <br><br>
  * Usa o padrão de projeto <code>Strategy</code>.
  * 
- * @see AddArestaNPND
- * @see AddArestaPND
- * @see AddArestaNPD
- * @see AddArestaPD
- * @autor henrish0
+ * @see Grafo.AddArestaNPND
+ * @see Grafo.AddArestaPND
+ * @see Grafo.AddArestaNPD
+ * @see Grafo.AddArestaPD
+ * @author henrish0
  */
 interface IAddAresta {
     /**
      * Adiciona uma aresta ao grafo.
      * 
-     * @param origem
-     * @param destino
+     * @param origem Vértice de origem da aresta.
+     * @param destino Vértice de destino da aresta.
      * @return <code>true</code> se a aresta foi adicionada, <code>false</code> se a
      *         aresta já existia.
      */

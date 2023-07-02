@@ -22,7 +22,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.TreeMap;
+import java.util.Collection;
+import java.util.HashMap;
 
 /**
  * Classe que representa um grafo.
@@ -30,14 +31,14 @@ import java.util.TreeMap;
  * @see <a href="https://pt.wikipedia.org/wiki/Grafo">Grafo</a>
  * @see Vertice
  * @see IAresta
- * @autor henrish0
+ * @author henrish0
  */
 public class Grafo {
     /** Nome do grafo. */
     private final String NOME;
 
     /** Vértices do grafo. */
-    private TreeMap<Integer, Vertice> vertices;
+    private HashMap<Integer, Vertice> vertices;
 
     /** Estratégia de adição de arestas. */
     private IAddAresta addAresta;
@@ -51,11 +52,13 @@ public class Grafo {
     /**
      * Construtor padrão.
      * 
-     * @param nome Nome do grafo.
+     * @param nome        Nome do grafo.
+     * @param ponderado   Indica se o grafo é ponderado.
+     * @param direcionado Indica se o grafo é direcionado.
      */
     public Grafo(String nome, Boolean ponderado, Boolean direcionado) {
         this.NOME = nome;
-        this.vertices = new TreeMap<Integer, Vertice>();
+        this.vertices = new HashMap<Integer, Vertice>();
         switch ((ponderado ? 1 : 0) + (direcionado ? 2 : 0)) {
             case 0 -> this.addAresta = new AddArestaNPND();
             case 1 -> this.addAresta = new AddArestaPND();
@@ -76,7 +79,6 @@ public class Grafo {
     public Boolean addVertice(Integer id) {
         if (this.vertices.containsKey(id))
             return false;
-
         return this.vertices.put(id, new Vertice(id)) == null;
     }
 
@@ -91,7 +93,7 @@ public class Grafo {
     public Boolean addAresta(Integer id1, Integer id2) {
         Vertice vOrigem = vertices.get(id1),
                 vDestino = vertices.get(id2);
-        return vOrigem == null || vDestino == null || vOrigem.haAresta(vDestino.getID()) ? false
+        return vOrigem == null || vDestino == null || id1.equals(id2) || vOrigem.haAresta(vDestino.getID()) ? false
                 : this.addAresta.addAresta(vOrigem, vDestino);
     }
 
@@ -106,7 +108,7 @@ public class Grafo {
         Vertice v = vertices.remove(id);
         if (v == null)
             return false;
-        vertices.values().forEach(v2 -> v2.removerAresta(id));
+        this.vertices.values().forEach(v2 -> v2.removerAresta(id));
         return true;
     }
 
@@ -119,8 +121,8 @@ public class Grafo {
      *         aresta não existia.
      */
     public Boolean removerAresta(Integer id1, Integer id2) {
-        Vertice vOrigem = vertices.get(id1),
-                vDestino = vertices.get(id2);
+        Vertice vOrigem = this.vertices.get(id1),
+                vDestino = this.vertices.get(id2);
         return vOrigem == null || vDestino == null || !vOrigem.haAresta(vDestino.getID()) ? false
                 : vOrigem.removerAresta(vDestino.getID())
                         && (!this.direcionado ? vDestino.removerAresta(vOrigem.getID()) : true);
@@ -133,36 +135,54 @@ public class Grafo {
      * @return <code>true</code> se o grafo foi gerado, <code>false</code> se o
      *         grafo não foi gerado.
      */
-    public Boolean gerarCompleto(int n) {
+    public static Grafo gerarCompleto() {
+        Integer n = App.lerInt(" Digite o número de vértices do grafo: ");
+        Grafo g = new Grafo(App.lerStr(" Digite o nome do grafo: "), n);
         if (n < 1)
-            return false;
-
+            return null;
         for (int i = 0; i < n; i++)
-            this.addVertice(i);
-
+            g.addVertice(i);
         for (int i = 0; i < n; i++)
-            for (int j = 0; j < n; j++)
-                if (i != j)
-                    this.addAresta(i, j);
-
-        return true;
+            for (int j = i + 1; j < n; j++)
+                g.addAresta(i, j);
+        return g;
     }
 
     /**
      * Verifica se o grafo é completo.
      * 
      * @return <code>true</code> se o grafo é completo, <code>false</code> se o
-     *         grafo
-     *         não é completo.
+     *         grafo não é completo.
      */
     public Boolean completo() {
         if (this.vertices.isEmpty())
             return true;
+        int n = this.vertices.size();
+        return this.vertices.values().stream().allMatch(v -> v.getArestas().size() == n - 1);
+    }
 
+    /**
+     * Verifica se o grafo é fortemente conexo.
+     * 
+     * @return <code>true</code> se o grafo é fortemente conexo, <code>false</code>
+     *         se ografo não é fortemente conexo.
+     */
+    public Boolean fortementeConexo() {
+        if (this.vertices.isEmpty())
+            return true;
+        this.prepararBuscas().forEach(v -> v.getArestas().forEach(a -> a.getDestino().setVisitado(true)));
+        return this.vertices.values().stream().allMatch(Vertice::getVisitado);
+    }
+
+    /**
+     * Método auxiliar para falsificar o atributo visitado de todos os vértices do
+     * grafo.
+     * 
+     * @return Coleção de vértices do grafo para iterações e streams.
+     */
+    private Collection<Vertice> prepararBuscas() {
         this.vertices.values().forEach(v -> v.setVisitado(false));
-        this.vertices.firstEntry().getValue().setVisitado(true);
-        return this.vertices.values().stream().allMatch(v -> v.getVisitado()
-                && v.getArestas().stream().allMatch(a -> a.getDestino().getVisitado()));
+        return this.vertices.values();
     }
 
     /**
@@ -176,9 +196,9 @@ public class Grafo {
                 (this.ponderado ? "1" : "0") +
                         (this.direcionado ? "1" : "0") + "\n" //
         );
-        vertices.values().forEach(v -> sb.append(v.getID()).append(";")); // IDs dos vértices
+        this.vertices.values().forEach(v -> sb.append(v.getID()).append(";")); // IDs dos vértices
         sb.append("\n");
-        vertices.values().forEach(v -> sb.append(v.toFile())); // Arestas
+        this.vertices.values().forEach(v -> sb.append(v.toFile())); // Arestas
         return Arquivo.salvarGrafo(new String(sb), this.NOME);
     }
 
@@ -190,29 +210,47 @@ public class Grafo {
      */
     public static Grafo carregar(String nome) {
         return Arquivo.lerGrafo(nome);
-    }
+    }// @formatter:off
+
+    /**Construtor para grafos completos, se difere pelo tamanho pré-definido do HashMap de vértices e pelo método de adição de arestas.
+     * @param nome        Nome do grafo.
+     * @param nVertices   Número de vértices do grafo.*/
+    private Grafo(String nome, Integer nVertices) { this.NOME = nome; this.vertices = new HashMap<Integer, Vertice>(nVertices); this.addAresta = new AddArestaNPND(); this.ponderado = false; this.direcionado = false;}
+
+    /**Construtor para leitura grafos, se difere pelo tamanho pré-definido do HashMap de vértices.
+     * @param nome        Nome do grafo.
+     * @param ponderado   Indica se o grafo é ponderado.
+     * @param direcionado Indica se o grafo é direcionado.
+     * @param direcionado Indica se o grafo é direcionado.*/
+    private Grafo(String nome, Boolean ponderado, Boolean direcionado, Integer nVertices) { this.NOME = nome; this.vertices = new HashMap<Integer, Vertice>(nVertices); switch ((ponderado ? 1 : 0) + (direcionado ? 2 : 0)) { case 0 -> this.addAresta = new AddArestaNPND(); case 1 -> this.addAresta = new AddArestaPND(); case 2 -> this.addAresta = new AddArestaNPD(); case 3 -> this.addAresta = new AddArestaPD(); } this.ponderado = ponderado; this.direcionado = direcionado;}
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        vertices.values().forEach(v -> sb.append(v.toString()));
+        this.vertices.values().forEach(v -> sb.append(v.toString()));
         return "\n\nGrafo \"" + this.NOME + "\", vertices= {" + new String(sb) + "\n}";
-    }// @formatter:off
+    }
 
     /** Define a forma de adicionar arestas ao grafo não ponderado não direcionado. */ 
     private class AddArestaNPND implements IAddAresta {
+        /** Construtor privado para impedir a criação de instâncias fora da classe Grafo. */
+        private AddArestaNPND() {}
         @Override public Boolean addAresta(Vertice origem, Vertice destino) {
             return origem.addAresta(new Aresta(destino)) && destino.addAresta(new Aresta(origem));
         }
     }
     /** Define a forma de adicionar arestas ao grafo não ponderado direcionado. */
     private class AddArestaNPD implements IAddAresta {
+        /** Construtor privado para impedir a criação de instâncias fora da classe Grafo. */
+        private AddArestaNPD() {}
         @Override public Boolean addAresta(Vertice origem, Vertice destino) {
-            return origem.addAresta(new Aresta(vertices.get(destino.getID())));
+            return origem.addAresta(new Aresta(destino));
         }
     }
     /** Define a forma de adicionar arestas ao grafo ponderado não direcionado. */
     private class AddArestaPND implements IAddAresta {
+        /** Construtor privado para impedir a criação de instâncias fora da classe Grafo. */
+        private AddArestaPND() {}
         @Override public Boolean addAresta(Vertice origem, Vertice destino) {
             int peso = App.lerInt("Peso da aresta: ");
             return origem.addAresta(new ArestaPonderada(destino, peso)) && destino.addAresta(new ArestaPonderada(origem, peso));
@@ -220,8 +258,10 @@ public class Grafo {
     }
     /** Define a forma de adicionar arestas ao grafo ponderado direcionado. */
     private class AddArestaPD implements IAddAresta {
+        /** Construtor privado para impedir a criação de instâncias fora da classe Grafo. */
+        private AddArestaPD() {}
         @Override public Boolean addAresta(Vertice origem, Vertice destino) {
-            return origem.addAresta(new ArestaPonderada(vertices.get(destino.getID()), App.lerInt("Peso da aresta: ")));
+            return origem.addAresta(new ArestaPonderada(destino, App.lerInt("Peso da aresta: ")));
         }
     }
 
@@ -231,6 +271,9 @@ public class Grafo {
         private static String TIPO = ".csv";
         /** Pasta onde os arquivos são salvos. */
         private static String PASTA = "data/";
+
+        /** Construtor que garante classe não instanciável */
+        private Arquivo() { throw new InstantiationError("Classe nao instanciavel"); }
 
         /**
          * Salva o grafo em um arquivo.
@@ -258,9 +301,10 @@ public class Grafo {
         private static Grafo lerGrafo(String nome) {
             Grafo out = null;
             try (BufferedReader br = new BufferedReader(new FileReader(PASTA + nome + TIPO))) {
-                String linha = br.readLine();
-                out = new Grafo(nome, linha.charAt(0) == '1', linha.charAt(1) == '1');
-                for (String id : br.readLine().split(";"))
+                String info = br.readLine();
+                String[] vertices = br.readLine().split(";");
+                out = new Grafo(nome, info.charAt(0) == '1', info.charAt(1) == '1', vertices.length);
+                for (String id : vertices)
                     out.addVertice(Integer.parseInt(id));
                 for (String item : br.readLine().split(";")) {
                     String[] ids = item.split("-");
@@ -276,4 +320,5 @@ public class Grafo {
             return out;
         } // @formatter:on
     }
+
 }

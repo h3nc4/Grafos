@@ -26,7 +26,7 @@
  * @see Aresta
  * @see ArestaPonderada
  * @see IAddAresta
- * @autor henrish0
+ * @author henrish0
  */
 public interface IAresta {
     /**
